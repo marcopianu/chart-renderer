@@ -1,0 +1,22 @@
+{
+  "name": "chart-renderer",
+  "version": "1.0.0",
+  "description": "Server-side Chart.js renderer with annotation + datalabels plugins.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "chart.js": "4.4.1",
+    "chartjs-adapter-date-fns": "3.0.0",
+    "chartjs-node-canvas": "4.1.6",
+    "chartjs-plugin-annotation": "3.0.1",
+    "chartjs-plugin-datalabels": "2.2.0",
+    "cors": "2.8.5",
+    "express": "4.19.2"
+  }
+}
