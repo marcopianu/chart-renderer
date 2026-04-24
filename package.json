@@ -11,10 +11,10 @@
     "node": "20.x"
   },
   "dependencies": {
-    "chart.js": "4.4.1",
+    "chart.js": "4.4.8",
     "chartjs-adapter-date-fns": "3.0.0",
     "chartjs-node-canvas": "5.0.0",
-    "chartjs-plugin-annotation": "3.0.1",
+    "chartjs-plugin-annotation": "3.1.0",
     "chartjs-plugin-datalabels": "2.2.0",
     "cors": "2.8.5",
     "express": "4.19.2",
