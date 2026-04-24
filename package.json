@@ -8,15 +8,16 @@
     "start": "node server.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": "20.x"
   },
   "dependencies": {
     "chart.js": "4.4.1",
     "chartjs-adapter-date-fns": "3.0.0",
-    "chartjs-node-canvas": "4.1.6",
+    "chartjs-node-canvas": "5.0.0",
     "chartjs-plugin-annotation": "3.0.1",
     "chartjs-plugin-datalabels": "2.2.0",
     "cors": "2.8.5",
-    "express": "4.19.2"
+    "express": "4.19.2",
+    "date-fns": "3.6.0"
   }
 }
