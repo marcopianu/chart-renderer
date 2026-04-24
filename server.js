@@ -4,7 +4,6 @@ const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
 const Chart = require('chart.js');
 const annotationPlugin = require('chartjs-plugin-annotation');
 const datalabelsPlugin = require('chartjs-plugin-datalabels');
-require('chartjs-adapter-date-fns');
 
 const app = express();
 app.use(cors({ origin: '*' }));
