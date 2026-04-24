@@ -11,19 +11,48 @@ app.use(express.json({ limit: '2mb' }));
 
 Chart.Chart.register(annotationPlugin);
 
-const canvas = new ChartJSNodeCanvas({
-  width: 1200,
-  height: 680,
-  backgroundColour: 'white',
-  chartCallback: (ChartJS) => {
-    ChartJS.defaults.font.family = "'Helvetica Neue', 'Arial', sans-serif";
-    ChartJS.defaults.font.size = 12;
-    ChartJS.defaults.color = '#374151';
+function buildCanvas(width, height) {
+  return new ChartJSNodeCanvas({
+    width: width || 1200,
+    height: height || 680,
+    backgroundColour: 'white',
+    chartCallback: (ChartJS) => {
+      ChartJS.defaults.font.family = "'Helvetica Neue', 'Arial', sans-serif";
+      ChartJS.defaults.font.size = 12;
+      ChartJS.defaults.color = '#374151';
+    }
+  });
+}
+
+// Rehydrate function-based options that JSON strips.
+// The incoming config has `options.plugins.datalabels` as a plain object.
+// If it contains a magic marker mode, we replace it with real functions here.
+function rehydrateDatalabels(config) {
+  const dl = config?.options?.plugins?.datalabels;
+  if (!dl) return;
+
+  // mode "series_end_label" = show each series' label at the last data point only
+  if (dl.mode === 'series_end_label') {
+    dl.display = function (ctx) {
+      return ctx.dataIndex === ctx.chart.data.labels.length - 1;
+    };
+    dl.formatter = function (_value, ctx) { return ctx.dataset.label; };
+    dl.color = function (ctx) { return ctx.dataset.borderColor || '#374151'; };
+    dl.align = dl.align || 'right';
+    dl.anchor = dl.anchor || 'end';
+    dl.offset = dl.offset != null ? dl.offset : 8;
+    dl.clamp = dl.clamp != null ? dl.clamp : true;
+    if (!dl.font) dl.font = { size: 12, weight: '600' };
+    delete dl.mode;
+  } else {
+    // If mode not set, disable datalabels entirely rather than letting it
+    // draw a number on every single point.
+    config.options.plugins.datalabels = { display: false };
   }
-});
+}
 
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', version: '1.0.0' });
+  res.json({ status: 'ok', version: '1.1.0' });
 });
 
 app.post('/render', async (req, res) => {
@@ -34,22 +63,12 @@ app.post('/render', async (req, res) => {
     }
 
     const usesDatalabels = !!(config.options?.plugins?.datalabels);
+    if (usesDatalabels) rehydrateDatalabels(config);
+
     const pluginInstances = usesDatalabels ? [datalabelsPlugin] : [];
+    const canvas = buildCanvas(width, height);
 
-    const renderCanvas = (width || height)
-      ? new ChartJSNodeCanvas({
-          width: width || 1200,
-          height: height || 680,
-          backgroundColour: 'white',
-          chartCallback: (ChartJS) => {
-            ChartJS.defaults.font.family = "'Helvetica Neue', 'Arial', sans-serif";
-            ChartJS.defaults.font.size = 12;
-            ChartJS.defaults.color = '#374151';
-          }
-        })
-      : canvas;
-
-    const image = await renderCanvas.renderToBuffer(
+    const image = await canvas.renderToBuffer(
       { ...config, plugins: pluginInstances },
       'image/png'
     );
